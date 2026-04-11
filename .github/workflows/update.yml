@@ -1,5 +1,8 @@
 name: Weekly Theater Auto-Update
 
+permissions:
+  contents: write
+  
 on:
   schedule:
     # רץ כל יום ראשון בשעה 06:00 בבוקר (זמן אנגליה/UTC, שזה 08:00 או 09:00 שעון ישראל)
