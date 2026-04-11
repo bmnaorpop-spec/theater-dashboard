@@ -64,7 +64,6 @@ def process_data():
         category = categorize_show(show.get('title', ''), show.get('theater', ''))
         days_heb = ["שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת", "ראשון"]
         
-        # --- חילוץ שעות חכם לניקו ניתאי ---
         time_str = show.get('time', '').replace('הצגה קרובה: ', '').strip('| ')
         if "כלול" in time_str or not re.search(r'\d{1,2}:\d{2}', time_str):
             time_match = re.search(r'(\d{1,2}:\d{2})', raw_date_str)
@@ -121,7 +120,6 @@ def generate_html(shows):
         <div class="container">
             <h1>🎭 לוח הצגות למגמות תיאטרון (אפריל - יוני 2026)</h1>
             <p class="stats">הצגות מסוננות (ראשון, שני, רביעי, חמישי בלבד)</p>
-            
             <div class="filters">
                 <select id="monthFilter" onchange="renderTable()">
                     <option value="all">🗓️ כל החודשים</option>
@@ -129,7 +127,6 @@ def generate_html(shows):
                     <option value="5">מאי</option>
                     <option value="6">יוני</option>
                 </select>
-                
                 <select id="catFilter" onchange="renderTable()">
                     <option value="all">🏷️ כל הקטגוריות</option>
                     <option value="👑 קלאסיקה">👑 קלאסיקות</option>
@@ -138,7 +135,6 @@ def generate_html(shows):
                     <option value="⚪ רגיל">⚪ הצגות רגילות</option>
                 </select>
             </div>
-
             <table>
                 <thead>
                     <tr>
@@ -151,60 +147,43 @@ def generate_html(shows):
                         <th>פעולות</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody">
-                </tbody>
+                <tbody id="tableBody"></tbody>
             </table>
         </div>
-
         <script>
             const allShows = {shows_json};
-            
             function createGoogleCalendarLink(show) {{
                 let dateParts = show.date.split('/');
                 let dateStr = dateParts[2] + dateParts[1] + dateParts[0]; 
-                
                 let startTime = "200000"; 
                 let timeMatch = show.time.match(/(\\d{{1,2}}):(\\d{{2}})/);
-                if (timeMatch) {{
-                    startTime = timeMatch[1].padStart(2, '0') + timeMatch[2] + "00";
-                }}
-                
+                if (timeMatch) {{ startTime = timeMatch[1].padStart(2, '0') + timeMatch[2] + "00"; }}
                 let startHour = parseInt(startTime.substring(0,2));
                 let endHour = (startHour + 2).toString().padStart(2, '0');
                 if (parseInt(endHour) >= 24) endHour = "23"; 
                 let endTime = endHour + startTime.substring(2);
-
                 let dates = `${{dateStr}}T${{startTime}}/${{dateStr}}T${{endTime}}`;
-                
                 let title = encodeURIComponent(`${{show.title}} | ${{show.theater}}`);
                 let details = encodeURIComponent(`סיווג: ${{show.category}}\\n\\nלהזמנת כרטיסים ופרטים:\\n${{show.link}}`);
                 let loc = encodeURIComponent(show.theater);
-
                 return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${{title}}&dates=${{dates}}&details=${{details}}&location=${{loc}}`;
             }}
-
             function renderTable() {{
                 const monthFilter = document.getElementById('monthFilter').value;
                 const catFilter = document.getElementById('catFilter').value;
                 const tbody = document.getElementById('tableBody');
                 tbody.innerHTML = "";
-                
                 let count = 0;
-
                 allShows.forEach(show => {{
                     if (monthFilter !== 'all' && show.month.toString() !== monthFilter) return;
                     if (catFilter !== 'all' && show.category !== catFilter) return;
-                    
                     count++;
                     const tr = document.createElement('tr');
-                    
                     let rowClass = '';
                     if (show.category.includes('👑')) rowClass = 'cat-crown';
                     if (show.category.includes('📚')) rowClass = 'cat-study';
                     if (show.category.includes('🎭')) rowClass = 'cat-fringe';
-                    
                     let calLink = createGoogleCalendarLink(show);
-                    
                     tr.className = rowClass;
                     tr.innerHTML = `
                         <td>${{show.date}}</td>
@@ -228,10 +207,10 @@ def generate_html(shows):
     </html>
     """
     
-   output_file = 'index.html'
-with open(output_file, 'w', encoding='utf-8') as f:
-    f.write(html_content)
-    print(f">>> הלוח נוצר בהצלחה! פתח את: {output_file}")
+    output_file = 'index.html'
+    with open(output_file, 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    print(f">>> הלוח נוצר בהצלחה! פתח את: {{output_file}}")
 
 if __name__ == "__main__":
     filtered_data = process_data()
