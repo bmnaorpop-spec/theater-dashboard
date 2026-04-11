@@ -1,0 +1,39 @@
+name: Weekly Theater Auto-Update
+
+on:
+  schedule:
+    # רץ כל יום ראשון בשעה 06:00 בבוקר (זמן אנגליה/UTC, שזה 08:00 או 09:00 שעון ישראל)
+    - cron: '0 6 * * 0'
+  workflow_dispatch: # מוסיף כפתור שמאפשר לך להריץ את זה ידנית מתי שבא לך
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install libraries
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          playwright install chromium
+
+      - name: Run Scraper (Orchestrator)
+        run: python theater_orchestrator.py
+
+      - name: Run Dashboard Builder (Shula)
+        run: python shula_dash.py
+
+      - name: Commit and push updated files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add all_theaters_schedule.json index.html
+          git commit -m "Automated weekly theater update" || exit 0
+          git push
