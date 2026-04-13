@@ -558,7 +558,7 @@ def _log(theater: str, results: list):
 
 async def main():
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False)  # headless=True בייצור
+        browser = await p.chromium.launch(headless=True)  # headless=True בייצור
         context = await browser.new_context(
             user_agent=USER_AGENT,
             viewport={"width": 1920, "height": 1080},
