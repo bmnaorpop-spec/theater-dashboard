@@ -52,7 +52,7 @@ def parse_smart_date(date_str):
 
 def process_data():
     try:
-        with open('all_theaters_schedule.json', 'r', encoding='utf-8') as f:
+        with open('all_theaters_schedule_clean.json', 'r', encoding='utf-8') as f:
             shows = json.load(f)
     except Exception as e:
         print("שגיאה בטעינת הקובץ:", e)
